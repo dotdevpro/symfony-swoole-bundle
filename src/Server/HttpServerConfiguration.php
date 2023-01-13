@@ -321,7 +321,7 @@ class HttpServerConfiguration
     private function initializeSettings(array $init): void
     {
         $this->settings = [];
-        $cpuCores = \swoole_cpu_num();
+        $cpuCores = \OpenSwoole\Util::getCPUNum();
 
         if (!isset($init[self::SWOOLE_HTTP_SERVER_CONFIG_REACTOR_COUNT])) {
             $init[self::SWOOLE_HTTP_SERVER_CONFIG_REACTOR_COUNT] = $cpuCores;
