@@ -1,0 +1,150 @@
+{
+    "name": "k911/swoole-bundle",
+    "type": "library",
+    "description": "Swoole Symfony Bundle",
+    "keywords": [
+        "PHP",
+        "Bundle",
+        "Swoole",
+        "Async",
+        "HTTP",
+        "Server"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/k911/swoole-bundle",
+    "authors": [
+        {
+            "name": "Konrad Obal",
+            "email": "konrad.obal@gmail.com",
+            "homepage": "https://github.com/k911"
+        },
+        {
+            "name": "Martin Fris",
+            "email": "mfris@pixelfederation.com",
+            "homepage": "https://github.com/Rastusik"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "ext-json": "*",
+        "ext-openswoole": "^4.10.0",
+        "beberlei/assert": "^3.3",
+        "symfony/config": "^5.4|^6.0",
+        "symfony/console": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/http-foundation": "^5.4|^6.0",
+        "symfony/http-kernel": "^5.4|^6.0",
+        "symfony/process": "^5.4|^6.0",
+        "symfony/proxy-manager-bridge": "^5.4|^6.0"
+    },
+    "require-dev": {
+        "doctrine/annotations": "^1.13",
+        "doctrine/orm": "^2.11",
+        "friendsofphp/php-cs-fixer": "^3.7",
+        "jangregor/phpstan-prophecy": "^1.0",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpstan/extension-installer": "^1.0.2",
+        "phpstan/phpstan": "^1.4",
+        "phpstan/phpstan-beberlei-assert": "^1.0",
+        "phpstan/phpstan-doctrine": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpunit/php-code-coverage": "^9.1.0",
+        "phpunit/phpcov": "^8.0",
+        "phpunit/phpunit": "^9.5",
+        "ramsey/uuid": "^4.1",
+        "swoole/ide-helper": "^4.8",
+        "symfony/debug-pack": "^1.0",
+        "symfony/doctrine-messenger": "^5.4|^6.0",
+        "symfony/error-handler": "^5.4|^6.0",
+        "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/messenger": "^5.4|^6.0",
+        "symfony/monolog-bridge": "^5.4|^6.0",
+        "symfony/monolog-bundle": "^3.3",
+        "symfony/profiler-pack": "^1.0",
+        "symfony/twig-bundle": "^5.4|^6.0",
+        "symfony/var-dumper": "^5.4|^6.0",
+        "symfony/yaml": "^5.4|^6.0",
+        "upscale/swoole-blackfire": "^3.1"
+    },
+    "suggest": {
+        "ext-inotify": "To enable HMR",
+        "doctrine/orm": "For using Entity Manager Handler",
+        "symfony/messenger": "For using Symfony Messenger Swoole Task Transport.",
+        "upscale/swoole-blackfire": "To enable Blackfire profiling",
+        "pixelfederation/doctrine-resettable-em-bundle": "To be able to recover Doctrine Entity Managers from errors",
+        "symfony/error-handler": "To use Symfony Error Handler"
+    },
+    "autoload": {
+        "files": [
+            "src/functions_include.php"
+        ],
+        "psr-4": {
+            "K911\\Swoole\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "K911\\Swoole\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "console": [
+            "php tests/Fixtures/Symfony/app/console --ansi"
+        ],
+        "static-analyse-src": [
+            "phpstan analyze src -l 7 -c phpstan.neon.dist --ansi --memory-limit=512M"
+        ],
+        "static-analyse-tests": [
+            "phpstan analyze tests -l 4 -c phpstan.tests.neon --ansi --memory-limit=512M"
+        ],
+        "cs-analyse": [
+            "php-cs-fixer fix -v --dry-run --diff --stop-on-violation --ansi"
+        ],
+        "analyse": [
+            "@static-analyse-src",
+            "@static-analyse-tests",
+            "@cs-analyse"
+        ],
+        "test": [
+            "@analyse",
+            "@unit-tests"
+        ],
+        "feature-tests": [
+            "phpunit tests/Feature --process-isolation --colors=always"
+        ],
+        "feature-tests-junit": [
+            "phpunit tests/Feature --process-isolation --colors=always --log-junit phpunit/junit.xml"
+        ],
+        "unit-code-coverage": [
+            "phpunit tests/Unit --coverage-php cov/unit-tests.cov --colors=always"
+        ],
+        "feature-code-coverage": [
+            "COVERAGE=1 phpunit tests/Feature --coverage-php cov/feature-tests.cov --colors=always --process-isolation"
+        ],
+        "merge-code-coverage": [
+            "phpcov merge cov --clover=cov/clover.xml"
+        ],
+        "fix": "php-cs-fixer fix -v --ansi",
+        "unit-tests": [
+            "phpunit tests/Unit --colors=always"
+        ],
+        "unit-tests-junit": [
+            "phpunit tests/Unit --colors=always --log-junit phpunit/junit.xml"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "v0.8.x-dev"
+        }
+    },
+    "config": {
+        "process-timeout": 1200,
+        "sort-packages": true,
+        "platform": {
+            "ext-swoole": "4.5.10"
+        },
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}

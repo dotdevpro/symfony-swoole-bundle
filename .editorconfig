@@ -1,0 +1,31 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[Makefile]
+indent_style = tab
+
+[*.pid]
+insert_final_newline = false
+
+[*.{yml,yaml,json}]
+indent_size = 2
+
+[src/Bridge/Symfony/**/*.{yml,yaml}]
+indent_size = 4
+
+[tests/Fixtures/Symfony/app/config/**/*.{yml,yaml}]
+indent_size = 4
+
+[composer.json]
+indent_size = 4
+
+[*.md]
+insert_final_newline = false
+trim_trailing_whitespace = false

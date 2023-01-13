@@ -1,0 +1,98 @@
+version: "3.8"
+x-env-aliases:
+  - &DEFAULT_BUILD_ARGS
+    PHP_TAG: "${PHP_VERSION:-7.4}-cli-alpine${ALPINE_VERSION:-3.13}"
+    PHP_API_VERSION: "${PHP_API_VERSION:-20190902}"
+    COMPOSER_ARGS: "${COMPOSER_ARGS:-install}"
+    SWOOLE_VERSION: "${SWOOLE_VERSION:-4.10.0}"
+    COMPOSER_TAG: "${COMPOSER_TAG:-2.0.11}"
+
+volumes:
+  coverage: {}
+
+services:
+  releaser:
+    image: "docker.io/pixelfederation/release-version-script:latest"
+    environment:
+      DEBUG: "${DEBUG:-0}"
+      DRY_RUN: "${DRY_RUN:-1}"
+      GH_REPOSITORY: "${GH_REPOSITORY:-pixelfederation/swoole-bundle}"
+      GH_COMMITER_NAME: "${GH_COMMITER_NAME:-Rastusik}"
+      GH_COMMITER_EMAIL: "${GH_COMMITER_EMAIL:-mfris@pixelfederation.com}"
+      GH_TOKEN: "${GH_TOKEN:-xxxxxxxx}"
+      GH_RELEASE_DRAFT: "${GH_RELEASE_DRAFT:-false}"
+      GH_RELEASE_PRERELEASE: "${GH_RELEASE_PRERELEASE:-false}"
+    volumes:
+      - "./.git:/usr/src/app/.git:rw"
+      - "./CHANGELOG.md:/usr/src/app/CHANGELOG.md:rw"
+
+  cli:
+    image: "${REGISTRY:-docker.io}/${NAMESPACE:-pixelfederation}/${IMAGE:-swoole-bundle}-cli:${TAG:-local}"
+    build:
+      context: .
+      target: cli
+      args:
+        <<: *DEFAULT_BUILD_ARGS
+    ports:
+      - 9501:9501
+
+  composer:
+    image: "${REGISTRY:-docker.io}/${NAMESPACE:-pixelfederation}/${IMAGE:-swoole-bundle}-composer:${TAG:-local}"
+    build:
+      context: .
+      target: Composer
+      args:
+        <<: *DEFAULT_BUILD_ARGS
+
+  coverage-xdebug:
+    image: "${REGISTRY:-docker.io}/${NAMESPACE:-pixelfederation}/${IMAGE:-swoole-bundle}-coverage-xdebug:${TAG:-local}"
+    build:
+      context: .
+      target: CoverageXdebug
+      args:
+        <<: *DEFAULT_BUILD_ARGS
+    volumes:
+      - coverage:/usr/src/app/cov
+
+  coverage-pcov:
+    image: "${REGISTRY:-docker.io}/${NAMESPACE:-pixelfederation}/${IMAGE:-swoole-bundle}-coverage-pcov:${TAG:-local}"
+    build:
+      context: .
+      target: CoveragePcov
+      args:
+        <<: *DEFAULT_BUILD_ARGS
+    volumes:
+      - coverage:/usr/src/app/cov
+
+  coverage-xdebug-feature-with-retry:
+    image: "${REGISTRY:-docker.io}/${NAMESPACE:-pixelfederation}/${IMAGE:-swoole-bundle}-coverage-xdebug:${TAG:-local}"
+    entrypoint:
+      - /bin/bash
+    command:
+      - tests/run-feature-tests-code-coverage.sh
+    build:
+      context: .
+      target: CoverageXdebug
+      args:
+        <<: *DEFAULT_BUILD_ARGS
+    volumes:
+      - coverage:/usr/src/app/cov
+
+  merge-code-coverage:
+    image: "${REGISTRY:-docker.io}/${NAMESPACE:-pixelfederation}/${IMAGE:-swoole-bundle}-merge-code-coverage:${TAG:-local}"
+    command: merge-code-coverage
+    build:
+      context: .
+      target: MergeCodeCoverage
+      args:
+        <<: *DEFAULT_BUILD_ARGS
+    volumes:
+      - coverage:/usr/src/app/cov
+
+  coverage-volume-helper:
+    image: "alpine:${ALPINE_VERSION:-3.13}"
+    entrypoint: sleep
+    command: infinity
+    working_dir: /usr/src/app
+    volumes:
+      - coverage:/usr/src/app/cov
